@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>639</width>
+    <height>492</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QiButton</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Config</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="11" column="3" colspan="3">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>126</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="startUponAlarmCheckBox">
+         <property name="text">
+          <string>Start upon Alarm</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Sample Rate:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="alarmHighEnabledCheckBox">
+         <property name="text">
+          <string>Alarm High Temp</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" colspan="3">
+        <widget class="QCheckBox" name="rolloverCheckBox">
+         <property name="text">
+          <string>Rollover</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="alarmLowEnabledCheckBox">
+         <property name="text">
+          <string>Alarm Low Temp</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="4">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Device Sample Counter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" colspan="3">
+        <widget class="QSpinBox" name="sampleRateSpinBox"/>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Mission Timestamp:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Mission Start Delay:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Time:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="4">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Mission Sample Counter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="3">
+        <widget class="QCheckBox" name="missionInProgressCheckBox">
+         <property name="text">
+          <string>Mission in Progress</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="5">
+        <widget class="QCheckBox" name="highResLoggingCheckBox">
+         <property name="text">
+          <string>High-Res Format</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="loggingCheckBox">
+         <property name="text">
+          <string>Logging</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" colspan="4">
+        <widget class="QDateTimeEdit" name="rtcEdit">
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" colspan="3">
+        <widget class="QLineEdit" name="alarmHighEdit"/>
+       </item>
+       <item row="1" column="5">
+        <widget class="QRadioButton" name="sampleRateSecondsRadioButton">
+         <property name="text">
+          <string>Seconds</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" colspan="3">
+        <widget class="QLineEdit" name="alarmLowEdit"/>
+       </item>
+       <item row="1" column="6">
+        <widget class="QRadioButton" name="sampleRateMinutesRadioButton">
+         <property name="text">
+          <string>Minutes</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <widget class="QCheckBox" name="alarmLowCheckBox">
+         <property name="text">
+          <string>Alarm</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QCheckBox" name="rtcEnabledCheckBox">
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <widget class="QCheckBox" name="alarmHighCheckBox">
+         <property name="text">
+          <string>Alarm</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="5">
+        <widget class="QCheckBox" name="waitingForAlarmCheckBox">
+         <property name="text">
+          <string>Waiting for Alarm</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4" colspan="2">
+        <widget class="QLineEdit" name="missionTimestampEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="4">
+        <widget class="QLineEdit" name="missionSampleCounterEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="4">
+        <widget class="QLineEdit" name="deviceSampleCounterEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="4">
+        <widget class="QSpinBox" name="missionStartDelaySpinBox"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Data</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QTableWidget" name="dataTable">
+         <column>
+          <property name="text">
+           <string>Time</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value [°C]</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>639</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDevice">
+    <property name="title">
+     <string>Device</string>
+    </property>
+    <addaction name="actionReadConfig"/>
+    <addaction name="actionReadData"/>
+    <addaction name="actionWriteConfig"/>
+    <addaction name="separator"/>
+    <addaction name="actionStopMission"/>
+    <addaction name="actionClearData"/>
+    <addaction name="actionStartMission"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>Data</string>
+    </property>
+    <addaction name="actionCopy"/>
+    <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionPlot"/>
+   </widget>
+   <addaction name="menuDevice"/>
+   <addaction name="menuData"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionReadConfig">
+   <property name="text">
+    <string>Read Config</string>
+   </property>
+  </action>
+  <action name="actionReadData">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Read Data</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy to Clipboard</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save to File</string>
+   </property>
+  </action>
+  <action name="actionPlot">
+   <property name="text">
+    <string>Plot</string>
+   </property>
+  </action>
+  <action name="actionWriteConfig">
+   <property name="text">
+    <string>Write Config</string>
+   </property>
+  </action>
+  <action name="actionStopMission">
+   <property name="text">
+    <string>Stop Mission</string>
+   </property>
+  </action>
+  <action name="actionClearData">
+   <property name="text">
+    <string>Clear Data</string>
+   </property>
+  </action>
+  <action name="actionStartMission">
+   <property name="text">
+    <string>Start Mission</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>336</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionReadConfig</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onReadConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionReadData</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onReadData()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionWriteConfig</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onWriteConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStopMission</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onStopMission()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClearData</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onClearData()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStartMission</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onStartMission()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onReadConfig()</slot>
+  <slot>onReadData()</slot>
+  <slot>onClearData()</slot>
+  <slot>onWriteConfig()</slot>
+  <slot>onStartMission()</slot>
+  <slot>onStopMission()</slot>
+ </slots>
+</ui>
