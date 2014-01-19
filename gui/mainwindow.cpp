@@ -35,11 +35,77 @@ void MainWindow::onReadConfig()
    m_ds1922->GetRtc(&rtc);
    rtcEdit->setDate(QDate(rtc.tm_year+1900, rtc.tm_mon+1, rtc.tm_mday));
    rtcEdit->setTime(QTime(rtc.tm_hour, rtc.tm_min, rtc.tm_sec));
+   rtcEnabledCheckBox->setChecked(m_ds1922->GetRtcEnabled());
    
+   sampleRateSpinBox->setValue(m_ds1922->GetSampleRate());
+   sampleRateSecondsRadioButton->setChecked(m_ds1922->GetHighspeedSampling());
+   sampleRateMinutesRadioButton->setChecked(!m_ds1922->GetHighspeedSampling());
+   
+   alarmLowEnabledCheckBox->setChecked(m_ds1922->GetAlarmLowEnabled());
+   alarmLowEdit->setText(QString::number(m_ds1922->GetAlarmLow()));
+   
+   alarmHighEnabledCheckBox->setChecked(m_ds1922->GetAlarmHighEnabled());
+   alarmHighEdit->setText(QString::number(m_ds1922->GetAlarmHigh()));
+   
+   loggingCheckBox->setChecked(m_ds1922->GetLoggingEnabled());
+   
+   highResLoggingCheckBox->setChecked(m_ds1922->GetHighResLogging());
+   
+   startUponAlarmCheckBox->setChecked(m_ds1922->GetStartUponAlarm());
+   
+   rolloverCheckBox->setChecked(m_ds1922->GetRollover());
+   
+   missionInProgressCheckBox->setChecked(m_ds1922->GetMissionInProgress());
+   
+   waitingForAlarmCheckBox->setChecked(m_ds1922->GetWaitingForAlarm());
+   
+   missionStartDelaySpinBox->setValue(m_ds1922->GetMissionStartDelay());
+   
+   QString timeStamp;
+   tm timeStampValue;
+   m_ds1922->GetMissionTimestamp(&timeStampValue);
+   timeStamp.sprintf("%02d.%02d.%02d %02d:%02d:%02d", timeStampValue.tm_mday, 
+                     timeStampValue.tm_mon+1, timeStampValue.tm_year-100, timeStampValue.tm_hour, 
+                     timeStampValue.tm_min, timeStampValue.tm_sec);
+   missionTimestampEdit->setText(timeStamp);
+   
+   missionSampleCounterEdit->setText(QString::number(m_ds1922->GetSampleCount()));
+   
+   deviceSampleCounterEdit->setText(QString::number(m_ds1922->GetDeviceSampleCount()));
+   
+   actionReadData->setEnabled(true);
 }
 
 void MainWindow::onReadData()
 {
+   int sampleCount=m_ds1922->GetSampleCount();
+   int sampleRate=m_ds1922->GetSampleRate();
+   
+   tm timeStampValue;
+   m_ds1922->GetMissionTimestamp(&timeStampValue);
+   
+   double buffer[sampleCount];
+   if (!m_ds1922->ReadData(buffer, sampleCount)) {
+     QMessageBox::critical(this, "Error", tr("Error reading data:\n")+m_ds1922->GetLastError().c_str());
+     return;
+   }
+   
+   dataTable->setRowCount(sampleCount);
+   QDateTime dateTime(QDate(timeStampValue.tm_year+1900, timeStampValue.tm_mon+1, timeStampValue.tm_mday),
+                      QTime(timeStampValue.tm_hour, timeStampValue.tm_min, timeStampValue.tm_sec));
+   
+   if (!m_ds1922->GetHighspeedSampling()) {
+     sampleRate=sampleRate*60;
+   }
+   
+   for(int i=0; i<sampleCount; i++){
+      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[i]));
+      QTableWidgetItem *time = new QTableWidgetItem(dateTime.addSecs(i*sampleRate).toString(Qt::SystemLocaleShortDate));
+      dataTable->setItem(i, 1, temperature);
+      dataTable->setItem(i, 0, time);     
+   }
+   
+   
 }
 
 void MainWindow::onWriteConfig()

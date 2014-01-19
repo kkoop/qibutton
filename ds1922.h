@@ -45,7 +45,7 @@ public:
    void GetMissionTimestamp(tm* time); // "
    int GetSampleRate();       // "
    bool GetRtcEnabled();
-   bool GetHighspeedSample(); // "
+   bool GetHighspeedSampling(); // "
    bool GetAlarmLowEnabled(); // "
    bool GetAlarmHighEnabled();// "
    double GetAlarmLowThreshold(); // "

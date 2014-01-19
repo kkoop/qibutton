@@ -80,7 +80,14 @@
         </widget>
        </item>
        <item row="1" column="2" colspan="3">
-        <widget class="QSpinBox" name="sampleRateSpinBox"/>
+        <widget class="QSpinBox" name="sampleRateSpinBox">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>16383</number>
+         </property>
+        </widget>
        </item>
        <item row="8" column="0">
         <widget class="QLabel" name="label_6">
@@ -220,7 +227,11 @@
         </widget>
        </item>
        <item row="7" column="4">
-        <widget class="QSpinBox" name="missionStartDelaySpinBox"/>
+        <widget class="QSpinBox" name="missionStartDelaySpinBox">
+         <property name="maximum">
+          <number>65000</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -256,7 +267,7 @@
      <x>0</x>
      <y>0</y>
      <width>639</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDevice">

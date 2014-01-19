@@ -351,7 +351,7 @@ bool DS1922::GetRtcEnabled()
    return (m_statusRegister[0x12]&0x1)==0x1;
 }
 
-bool DS1922::GetHighspeedSample()
+bool DS1922::GetHighspeedSampling()
 {
    return (m_statusRegister[0x12]&0x2)==0x2;
 }
