@@ -231,11 +231,16 @@ bool DS1922::ReadCalibration()
       return false;
    }
    // calculation according to datasheet
-   double Tr1 = 60,   // for DS1922L
-      Tr2 = page[0]/2.0-41 + page[1]/512.0,
-      Tc2 = page[2]/2.0-41 + page[3]/512.0,
-      Tr3 = page[4]/2.0-41 + page[5]/512.0,
-      Tc3 = page[6]/2.0-41 + page[7]/512.0;
+   int tempOffset = 1;
+   double Tr1 = 90;
+   if (GetType()==DS1922L) {
+      tempOffset = 41;
+      Tr1 = 60;
+   }
+   double Tr2 = page[0]/2.0-tempOffset + page[1]/512.0,
+      Tc2 = page[2]/2.0-tempOffset + page[3]/512.0,
+      Tr3 = page[4]/2.0-tempOffset + page[5]/512.0,
+      Tc3 = page[6]/2.0-tempOffset + page[7]/512.0;
          
    double   Err2 = Tc2 - Tr2,
       Err3 = Tc3 - Tr3;
@@ -284,7 +289,10 @@ bool DS1922::ReadData(double* buffer, int size)
 double DS1922::ConvertValue(unsigned char hiByte, unsigned char loByte)
 {
    // convert to °C
-   double result = hiByte/2.0-41 + loByte/512.0; 
+   int tempOffset = 1;
+   if (GetType()==DS1922L)
+      tempOffset = 41;
+   double result = hiByte/2.0-tempOffset + loByte/512.0; 
    // apply calibration correction
    if (m_calibrationValid) {
       result -= m_calibration[0]*result*result + m_calibration[1]*result + m_calibration[2];
@@ -368,12 +376,20 @@ bool DS1922::GetAlarmHighEnabled()
 
 double DS1922::GetAlarmLowThreshold()
 {
-   return m_statusRegister[0x08]/2.0 - 41;
+   int tempOffset = 1;
+   if (GetType()==DS1922L)
+      tempOffset = 41;
+
+   return m_statusRegister[0x08]/2.0 - tempOffset;
 }
 
 double DS1922::GetAlarmHighThreshold()
 {
-   return m_statusRegister[0x09]/2.0 - 41;
+   int tempOffset = 1;
+   if (GetType()==DS1922L)
+      tempOffset = 41;
+
+   return m_statusRegister[0x09]/2.0 - tempOffset;
 }
 
 bool DS1922::GetAlarmLow()
@@ -460,12 +476,20 @@ void DS1922::SetAlarmEnabled(bool tempLow, bool tempHigh)
 
 void DS1922::SetAlarmLowThreshold(double temp)
 {
-   m_statusRegister[0x08] = (unsigned char)((temp+41)*2);
+   int tempOffset = 1;
+   if (GetType()==DS1922L)
+      tempOffset = 41;
+
+   m_statusRegister[0x08] = (unsigned char)((temp+tempOffset)*2);
 }
 
 void DS1922::SetAlarmHighThreshold(double temp)
 {
-   m_statusRegister[0x09] = (unsigned char)((temp+41)*2);
+   int tempOffset = 1;
+   if (GetType()==DS1922L)
+      tempOffset = 41;
+
+   m_statusRegister[0x09] = (unsigned char)((temp+tempOffset)*2);
 }
 
 void DS1922::SetRtcEnabled(bool enabled)
@@ -521,4 +545,13 @@ void DS1922::SetMissionStartDelay(int delay)
    m_statusRegister[0x18] = (delay&0xff0000)>>16;
    m_statusRegister[0x17] = (delay&0xff00)>>8;
    m_statusRegister[0x16] = (delay&0xff)>>0;
+}
+
+DS1922::Type DS1922::GetType()
+{
+   if (m_statusRegister[0x26]==0x40)
+      return DS1922L;
+   if (m_statusRegister[0x26]==0x60)
+      return DS1922T;
+   return Other;
 }

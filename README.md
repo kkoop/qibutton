@@ -23,5 +23,7 @@ TODO
 - [ ] Currently no ROM matching is done, so this works only for one 
 1-Wire device on the bus. In the DS9490B there is only space for
 one iButton device. The ROM in the DS9490B is another 1-Wire device,
-but it should ignore the DS1922 specific commmands. 
-- [ ] Support for DS1922T should be added
+but it should ignore the DS1922 specific commmands.
+- [ ] Handle low sample rate
+- [ ] Handle rollover
+- [x] Add support for DS1922T
