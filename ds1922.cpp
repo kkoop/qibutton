@@ -208,7 +208,7 @@ bool DS1922::StopMission()
 
 bool DS1922::ClearMemory()
 {
-   unsigned char command[] = {0x96, // start mission
+   unsigned char command[] = {0x96, // clear memory
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
       0xFF  // dummy byte
    };

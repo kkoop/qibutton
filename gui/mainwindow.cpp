@@ -41,10 +41,22 @@ void MainWindow::onReadConfig()
    sampleRateSecondsRadioButton->setChecked(m_ds1922->GetHighspeedSampling());
    sampleRateMinutesRadioButton->setChecked(!m_ds1922->GetHighspeedSampling());
    
-   alarmLowEnabledCheckBox->setChecked(m_ds1922->GetAlarmLowEnabled());
+   if(m_ds1922->GetAlarmLowEnabled()) {
+      lowAlarmLabel->setText("yes");
+   }
+   
+   if(!m_ds1922->GetAlarmLowEnabled()) {
+      lowAlarmLabel->setText("no");
+   }
    alarmLowEdit->setText(QString::number(m_ds1922->GetAlarmLow()));
    
-   alarmHighEnabledCheckBox->setChecked(m_ds1922->GetAlarmHighEnabled());
+      if(m_ds1922->GetAlarmHighEnabled()) {
+      highAlarmLabel->setText("yes");
+   }
+   
+   if(!m_ds1922->GetAlarmHighEnabled()) {
+      highAlarmLabel->setText("no");
+   }
    alarmHighEdit->setText(QString::number(m_ds1922->GetAlarmHigh()));
    
    loggingCheckBox->setChecked(m_ds1922->GetLoggingEnabled());
@@ -55,9 +67,21 @@ void MainWindow::onReadConfig()
    
    rolloverCheckBox->setChecked(m_ds1922->GetRollover());
    
-   missionInProgressCheckBox->setChecked(m_ds1922->GetMissionInProgress());
+   if(m_ds1922->GetMissionInProgress()) {
+      missionInProgressLabel->setText("yes");
+   }
    
-   waitingForAlarmCheckBox->setChecked(m_ds1922->GetWaitingForAlarm());
+   if(!m_ds1922->GetMissionInProgress()) {
+      missionInProgressLabel->setText("no");
+   }
+   
+   if(m_ds1922->GetWaitingForAlarm()) {
+      waitingForAlarmLabel->setText("yes");
+   }
+   
+   if(!m_ds1922->GetWaitingForAlarm() || !m_ds1922->GetMissionInProgress()) {
+      waitingForAlarmLabel->setText("no");
+   }
    
    missionStartDelaySpinBox->setValue(m_ds1922->GetMissionStartDelay());
    
@@ -73,11 +97,14 @@ void MainWindow::onReadConfig()
    
    deviceSampleCounterEdit->setText(QString::number(m_ds1922->GetDeviceSampleCount()));
    
-   actionReadData->setEnabled(true);
+//  actionReadData->setEnabled(true);
 }
 
 void MainWindow::onReadData()
-{
+{  
+   
+   
+   onReadConfig();
    int sampleCount=m_ds1922->GetSampleCount();
    int sampleRate=m_ds1922->GetSampleRate();
    
@@ -110,16 +137,24 @@ void MainWindow::onReadData()
 
 void MainWindow::onWriteConfig()
 {
+   
 }
 
 void MainWindow::onStopMission()
 {
+   m_ds1922->StopMission();
+   onReadConfig();
 }
 
 void MainWindow::onClearData()
 {
+   m_ds1922->ClearMemory();
+   onReadData();
 }
 
 void MainWindow::onStartMission()
 {
+   m_ds1922->ClearMemory();
+   m_ds1922->StartMission();
+   onReadConfig();
 }
