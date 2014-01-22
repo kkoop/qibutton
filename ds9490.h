@@ -21,6 +21,7 @@
 #define DS2490_H
 
 #include <string>
+#include <list>
 #include <usb.h>
 
 class DS9490
@@ -33,8 +34,7 @@ public:
    std::string GetLastError() {return m_lastError;}
    bool OpenUsbDevice();
    bool DeviceOpen() {return m_usbDevHandle!=NULL;}
-   bool Scan1WBus();
-   bool GetSerialNumber(uint64_t& serial);
+   bool Scan1WBus(std::list<uint64_t>& serials);
    bool Read1W(unsigned char* buffer, uint length);
    bool Write1W(unsigned char* buffer, uint length);
    bool Reset1W();
@@ -44,6 +44,7 @@ protected:
    bool ReadByte(unsigned char& read);
    bool WriteByte(unsigned char data);
    bool TouchByte(unsigned char write, unsigned char& read);
+   bool TouchBit(unsigned char write, unsigned char& read);
    
    // Data
 protected:

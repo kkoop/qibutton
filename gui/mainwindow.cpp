@@ -130,8 +130,7 @@ void MainWindow::onReadData()
 
 void MainWindow::onWriteConfig()
 {
-   
-   //TODO: clock enabling
+   //TODO: clock
    int sampleRate=sampleRateSpinBox->value();
    bool seconds=sampleRateSecondsRadioButton->isChecked();
    
@@ -158,8 +157,6 @@ void MainWindow::onWriteConfig()
    
    m_ds1922->SetRtcEnabled(rtcEnabledCheckBox->isChecked());
      
-   
-   
    m_ds1922->WriteRegister();
    onReadConfig();
 }

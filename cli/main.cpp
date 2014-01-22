@@ -31,6 +31,17 @@ int main(int argc, char **argv)
    DS1922 ds1922(&ds9490);
    
    ds9490.OpenUsbDevice();
+   
+   list<uint64_t> serials;
+   if (!ds9490.Scan1WBus(serials)) {
+      cout << ds9490.GetLastError() << endl;
+   } else {
+      for (list<uint64_t>::iterator it=serials.begin(); it!=serials.end(); ++it)
+      {
+         printf("Found device %016llx\n", *it);
+      }
+   }
+   
    if (!ds1922.ReadRegister()) {
       cout << ds1922.GetLastError() << endl;
    }
