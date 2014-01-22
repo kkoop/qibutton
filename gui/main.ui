@@ -102,7 +102,7 @@
        <item row="2" column="0">
         <widget class="QCheckBox" name="alarmLowEnabledCheckBox">
          <property name="text">
-          <string>Alarm Low Temp</string>
+          <string>Alarm Low Temp (°C)</string>
          </property>
         </widget>
        </item>
@@ -126,7 +126,7 @@
        <item row="3" column="0">
         <widget class="QCheckBox" name="alarmHighEnabledCheckBox">
          <property name="text">
-          <string>Alarm High Temp</string>
+          <string>Alarm High Temp (°C)</string>
          </property>
         </widget>
        </item>
@@ -206,7 +206,7 @@
        <item row="7" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Mission Start Delay:</string>
+          <string>Mission Start Delay (min):</string>
          </property>
         </widget>
        </item>

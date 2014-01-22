@@ -41,19 +41,20 @@ void MainWindow::onReadConfig()
    sampleRateSecondsRadioButton->setChecked(m_ds1922->GetHighspeedSampling());
    sampleRateMinutesRadioButton->setChecked(!m_ds1922->GetHighspeedSampling());
    
-   if(m_ds1922->GetAlarmLowEnabled()) {
+   if(m_ds1922->GetAlarmLow()) {
       lowAlarmLabel->setText("yes");
    } else {
       lowAlarmLabel->setText("no");
    }
-   alarmLowEdit->setText(QString::number(m_ds1922->GetAlarmLow()));
+   alarmLowEdit->setText(QString::number(m_ds1922->GetAlarmLowThreshold()));
    
-   if(m_ds1922->GetAlarmHighEnabled()) {
+   if(m_ds1922->GetAlarmHigh()) {
       highAlarmLabel->setText("yes");
    } else {
+
       highAlarmLabel->setText("no");
    }
-   alarmHighEdit->setText(QString::number(m_ds1922->GetAlarmHigh()));
+   alarmHighEdit->setText(QString::number(m_ds1922->GetAlarmHighThreshold()));
    
    loggingCheckBox->setChecked(m_ds1922->GetLoggingEnabled());
    
@@ -65,8 +66,12 @@ void MainWindow::onReadConfig()
    
    if(m_ds1922->GetMissionInProgress()) {
       missionInProgressLabel->setText("yes");
+      actionStartMission->setEnabled(0);
+      actionStopMission->setEnabled(1);
    } else {
       missionInProgressLabel->setText("no");
+      actionStopMission->setEnabled(0);
+      actionStartMission->setEnabled(1);
    }
    
    if(m_ds1922->GetWaitingForAlarm() && m_ds1922->GetMissionInProgress()) {
@@ -126,6 +131,37 @@ void MainWindow::onReadData()
 void MainWindow::onWriteConfig()
 {
    
+   //TODO: clock enabling
+   int sampleRate=sampleRateSpinBox->value();
+   bool seconds=sampleRateSecondsRadioButton->isChecked();
+   
+   m_ds1922->SetRtcHighspeed(seconds);
+   m_ds1922->SetSampleRate(sampleRate);
+   
+   bool low =alarmLowEnabledCheckBox->isChecked();
+   bool high=alarmHighEnabledCheckBox->isChecked();
+      
+   m_ds1922->SetAlarmEnabled(low, high);
+   
+   double lowAlarm=alarmLowEdit->text().toDouble();
+   double highAlarm=alarmHighEdit->text().toDouble();
+   m_ds1922->SetAlarmLowThreshold(lowAlarm);
+   m_ds1922->SetAlarmHighThreshold(highAlarm);
+   
+   m_ds1922->SetHighResLogging(highResLoggingCheckBox->isChecked());
+   m_ds1922->SetStartUponAlarm(startUponAlarmCheckBox->isChecked());
+
+   int delay=missionStartDelaySpinBox->value();
+   m_ds1922->SetMissionStartDelay(delay);
+   
+   m_ds1922->SetRollover(rolloverCheckBox->isChecked());
+   
+   m_ds1922->SetRtcEnabled(rtcEnabledCheckBox->isChecked());
+     
+   
+   
+   m_ds1922->WriteRegister();
+   onReadConfig();
 }
 
 void MainWindow::onStopMission()
