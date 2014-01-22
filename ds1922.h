@@ -79,6 +79,7 @@ public:
    
 protected:
    bool ReadMemPage(unsigned short address, unsigned char* buffer);
+   bool VerifyCrc(unsigned char* data, int length);
    double ConvertValue(unsigned char hiByte, unsigned char loByte);
    bool ReadCalibration();
    

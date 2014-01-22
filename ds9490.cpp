@@ -102,6 +102,15 @@ bool DS9490::Release()
    return true;
 }
 
+bool DS9490::Scan1WBus()
+{
+   if (!DeviceOpen()) {
+      m_lastError = "Device not open";
+      return false;
+   }
+   return false;
+}
+
 bool DS9490::GetSerialNumber(uint64_t& serial)
 {
    // TODO:

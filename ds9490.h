@@ -33,6 +33,7 @@ public:
    std::string GetLastError() {return m_lastError;}
    bool OpenUsbDevice();
    bool DeviceOpen() {return m_usbDevHandle!=NULL;}
+   bool Scan1WBus();
    bool GetSerialNumber(uint64_t& serial);
    bool Read1W(unsigned char* buffer, uint length);
    bool Write1W(unsigned char* buffer, uint length);

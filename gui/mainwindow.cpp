@@ -43,18 +43,14 @@ void MainWindow::onReadConfig()
    
    if(m_ds1922->GetAlarmLowEnabled()) {
       lowAlarmLabel->setText("yes");
-   }
-   
-   if(!m_ds1922->GetAlarmLowEnabled()) {
+   } else {
       lowAlarmLabel->setText("no");
    }
    alarmLowEdit->setText(QString::number(m_ds1922->GetAlarmLow()));
    
-      if(m_ds1922->GetAlarmHighEnabled()) {
+   if(m_ds1922->GetAlarmHighEnabled()) {
       highAlarmLabel->setText("yes");
-   }
-   
-   if(!m_ds1922->GetAlarmHighEnabled()) {
+   } else {
       highAlarmLabel->setText("no");
    }
    alarmHighEdit->setText(QString::number(m_ds1922->GetAlarmHigh()));
@@ -69,17 +65,13 @@ void MainWindow::onReadConfig()
    
    if(m_ds1922->GetMissionInProgress()) {
       missionInProgressLabel->setText("yes");
-   }
-   
-   if(!m_ds1922->GetMissionInProgress()) {
+   } else {
       missionInProgressLabel->setText("no");
    }
    
-   if(m_ds1922->GetWaitingForAlarm()) {
+   if(m_ds1922->GetWaitingForAlarm() && m_ds1922->GetMissionInProgress()) {
       waitingForAlarmLabel->setText("yes");
-   }
-   
-   if(!m_ds1922->GetWaitingForAlarm() || !m_ds1922->GetMissionInProgress()) {
+   } else {
       waitingForAlarmLabel->setText("no");
    }
    
@@ -102,8 +94,6 @@ void MainWindow::onReadConfig()
 
 void MainWindow::onReadData()
 {  
-   
-   
    onReadConfig();
    int sampleCount=m_ds1922->GetSampleCount();
    int sampleRate=m_ds1922->GetSampleRate();
@@ -131,8 +121,6 @@ void MainWindow::onReadData()
       dataTable->setItem(i, 1, temperature);
       dataTable->setItem(i, 0, time);     
    }
-   
-   
 }
 
 void MainWindow::onWriteConfig()

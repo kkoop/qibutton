@@ -271,18 +271,31 @@ bool DS1922::ReadData(double* buffer, int size)
    {
       size = missionSamples;
    }
-   int numPages = size/16 + (size%16 ? 1 : 0);
-   for (int i=0; i<numPages; i++)
-   {
-      if (!ReadMemPage(0x1000+i*32, page))
+   if (GetHighResLogging()) { // 2 byte per value
+      int numPages = size/16 + (size%16 ? 1 : 0);
+      for (int i=0; i<numPages; i++)
       {
-         return false;
-      }
-      for (int j=0; j<16 && i*16+j<size; j++)
+         if (!ReadMemPage(0x1000+i*32, page)) {
+            return false;
+         }
+         for (int j=0; j<16 && i*16+j<size; j++)
+         {
+            buffer[i*16+j] = ConvertValue(page[0+j*2], page[1+j*2]);
+         }
+      }  
+   } else { // 1 byte per value
+      int numPages = size/32 + (size%32 ? 1 : 0);
+      for (int i=0; i<numPages; i++)
       {
-         buffer[i*16+j] = ConvertValue(page[0+j*2], page[1+j*2]); 
-      }
-   }  
+         if (!ReadMemPage(0x1000+i*32, page)) {
+            return false;
+         }
+         for (int j=0; j<32 && i*32+j<size; j++)
+         {
+            buffer[i*32+j] = ConvertValue(page[j], 0);
+         }
+      }  
+   }
    return true;
 }
 
@@ -314,8 +327,40 @@ bool DS1922::ReadMemPage(short unsigned int address, unsigned char* buffer)
       m_lastError = m_ds9490->GetLastError();
       return false;
    }
+   unsigned char crcdata[3+32+2] = {0x69,
+      address&0xFF, (address&0xFF00)>>8};
+   memcpy(crcdata+3, buffer, 32);
+   if (!m_ds9490->Read1W(crcdata+3+32, 2)) {
+      m_lastError = m_ds9490->GetLastError();
+      return false;
+   }
+   if (!VerifyCrc(crcdata, 3+32+2)) {
+      m_lastError = "Wrong CRC reading data";
+      return false;
+   }
    return true;
 }
+
+bool DS1922::VerifyCrc(unsigned char* data, int length)
+{  // the CRC to verify has to be the last 2 bytes of data
+   const unsigned char oddparity[] = {0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0};
+
+   unsigned short crcReg = 0;
+   for (int i=0; i<length; i++) 
+   {
+      unsigned short dbyte = (data[i]^ (crcReg&0xff) )&0xff;
+      crcReg >>= 8;
+      if (oddparity[dbyte&0xf]^oddparity[dbyte>>4]) {
+         crcReg ^= 0xc001;
+      }
+      dbyte <<= 6;
+      crcReg ^= dbyte;
+      dbyte <<= 1;
+      crcReg ^= dbyte;
+   }
+   return crcReg==0xB001;
+}
+
 
 int DS1922::GetSampleCount()
 {
@@ -458,8 +503,11 @@ void DS1922::SetRtc(tm* time)
 
 void DS1922::SetSampleRate(int rate)
 {
-   m_statusRegister[7] = (rate&0x3f00)>>8;
-   m_statusRegister[6] = rate&0xff;
+   if ( (rate&0x3fff) > 0)
+   {  // Datasheet: Setting rate=0 results in unrecoverable state
+      m_statusRegister[7] = (rate&0x3f00)>>8;
+      m_statusRegister[6] = rate&0xff;
+   }
 }
 
 void DS1922::SetAlarmEnabled(bool tempLow, bool tempHigh)

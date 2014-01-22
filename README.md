@@ -1,7 +1,7 @@
 qibutton
 ========
 
-QIButton: read Dallas iButton (DS1922L) with DS9490
+QIButton: read Dallas iButton temperature logger DS1922 with DS9490
 
 About
 =====
@@ -24,6 +24,6 @@ TODO
 1-Wire device on the bus. In the DS9490B there is only space for
 one iButton device. The ROM in the DS9490B is another 1-Wire device,
 but it should ignore the DS1922 specific commmands.
-- [ ] Handle low sample rate
 - [ ] Handle rollover
+- [x] Handle low resolution mode
 - [x] Add support for DS1922T

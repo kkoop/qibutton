@@ -17,6 +17,8 @@
 */
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 #include "ds1922.h"
 #include "ds9490.h"
@@ -66,13 +68,30 @@ int main(int argc, char **argv)
              time.tm_min,
              time.tm_sec);
       cout << "-Data--------------------------------------------" << endl;
-      double values[4096];
-      if (!ds1922.ReadData(values, 4096)) {
-         cout << ds1922.GetLastError() << endl;
+      time_t tt = mktime(&time);
+      // handle rollover: the oldest value may not be the first one
+      int missionSamples = ds1922.GetSampleCount();
+      int maxMissionSamples = (ds1922.GetHighResLogging() ? 4096 : 8192);
+      int posOldestValue = missionSamples % maxMissionSamples;
+      int sampleRate = ds1922.GetSampleRate();
+      if (!ds1922.GetHighspeedSampling()) {
+         sampleRate *= 60;
       }
-      else{
-         for (int i=0; i<ds1922.GetSampleCount(); i++) {
-            cout << i << ": " << values[i] << endl;
+      if (missionSamples>maxMissionSamples) {
+         tt += sampleRate*(missionSamples-maxMissionSamples);
+         missionSamples = maxMissionSamples;
+      } else {
+         posOldestValue = 0;
+      }        
+      double values[missionSamples];
+      if (!ds1922.ReadData(values, missionSamples)) {
+         cout << ds1922.GetLastError() << endl;
+      } else {
+         for (int i=0; i<missionSamples; i++) {
+            char buffer[64];
+            strftime(buffer, 64, "%x %X", localtime(&tt));
+            cout << buffer << ": " << values[(i+posOldestValue)%maxMissionSamples] << endl;
+            tt += sampleRate;
          }
          return 0;
       }
