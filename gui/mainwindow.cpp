@@ -2,6 +2,11 @@
 #include "../ds1922.h"
 #include "../ds9490.h"
 #include <QMessageBox>
+#include <QClipboard>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QProcess>
+#include <QTemporaryFile>
 
 MainWindow::MainWindow(QWidget *parent)
  : QMainWindow(parent)
@@ -130,7 +135,9 @@ void MainWindow::onReadData()
 
 void MainWindow::onWriteConfig()
 {
+
    //TODO: clock
+
    int sampleRate=sampleRateSpinBox->value();
    bool seconds=sampleRateSecondsRadioButton->isChecked();
    
@@ -156,8 +163,14 @@ void MainWindow::onWriteConfig()
    m_ds1922->SetRollover(rolloverCheckBox->isChecked());
    
    m_ds1922->SetRtcEnabled(rtcEnabledCheckBox->isChecked());
-     
-   m_ds1922->WriteRegister();
+   
+   m_ds1922->SetLoggingEnabled(loggingCheckBox->isChecked());
+   
+   if (!m_ds1922->WriteRegister()) {
+     QMessageBox::critical(this, "Error", tr("Error writing config:\n")+m_ds1922->GetLastError().c_str());
+     return;
+   }  
+   
    onReadConfig();
 }
 
@@ -178,4 +191,81 @@ void MainWindow::onStartMission()
    m_ds1922->ClearMemory();
    m_ds1922->StartMission();
    onReadConfig();
+}
+
+
+QString MainWindow::GetDataAsCsv()
+{
+   QString data;
+   for (int i=0; i<dataTable->rowCount(); i++)
+   {
+     if (dataTable->item(i, 1)->text().toDouble())
+     {
+      data += dataTable->item(i, 0)->text();
+      data += "\t";
+      data += dataTable->item(i, 1)->text();
+      data += "\n";
+     }
+   }
+   return data;
+}
+
+void MainWindow::onCopy()
+{
+   QClipboard* clipboard = QApplication::clipboard();
+   clipboard->setText(GetDataAsCsv());
+}
+
+void MainWindow::onSafe()
+{
+   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                            "",
+                            "CSV (*.csv)");
+   if (!fileName.isEmpty())
+   {
+      QFile file(fileName);
+      if (file.open(QIODevice::WriteOnly))
+      {
+         QTextStream out(&file);
+         out << GetDataAsCsv();
+      }
+      else
+      {
+         QMessageBox::critical(this, tr("Error"), tr("Cannot open file for writting"));
+      }
+   }
+}
+
+
+void MainWindow::onPlot()
+{
+   QTemporaryFile dataFile;
+   QTemporaryFile scriptFile;
+   if (dataFile.open() && scriptFile.open()) 
+   {
+      dataFile.setAutoRemove(false);
+      scriptFile.setAutoRemove(false);
+      QTextStream out(&dataFile);
+      QString data = GetDataAsCsv();
+      data.replace(" ", "_");
+      out << data;
+      QTextStream scriptOut(&scriptFile);
+      scriptOut   << "set xdata time\n"
+               << "set timefmt \"%d.%m.%Y_%H:%M:%S\"\n" 
+               << "set format x \"%d.%m\"\n"
+               << "set ytics 36.00,0.0625\n"
+               << "set xtics \"01.01.2009_06:22:00\",864000*2\n"
+               << "set mxtics 20\n"
+               << "set grid\n"
+               << "plot '" << dataFile.fileName() << "' u 1:2 title \"Temperature\" with linespoints lt 4 lw 2\n" 
+               << "pause -1\n";
+               
+      QProcess *gnuplot = new QProcess();
+      QStringList arguments(scriptFile.fileName());
+      arguments << "-";
+      gnuplot->start("gnuplot", arguments);
+      gnuplot->waitForStarted();
+//    gnuplot->close();
+   }
+
 }

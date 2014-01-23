@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "ui_main.h"
 
+
+
 class DS1922;
 class DS9490;
 
@@ -21,6 +23,13 @@ public slots:
    virtual void onStopMission();
    virtual void onClearData();
    virtual void onStartMission();
+   virtual void onCopy();
+   virtual void onSafe();
+   virtual void onPlot();
+   
+private:
+QString GetDataAsCsv();
+   
    
    // data
 protected:

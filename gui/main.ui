@@ -493,6 +493,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onSafe()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopy</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onCopy()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPlot</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onReadConfig()</slot>
@@ -501,5 +549,8 @@
   <slot>onWriteConfig()</slot>
   <slot>onStartMission()</slot>
   <slot>onStopMission()</slot>
+  <slot>onSafe()</slot>
+  <slot>onPlot()</slot>
+  <slot>onCopy()</slot>
  </slots>
 </ui>
