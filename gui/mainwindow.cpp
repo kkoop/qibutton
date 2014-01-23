@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QProcess>
 #include <QTemporaryFile>
+#include "ui_about.h"
 
 MainWindow::MainWindow(QWidget *parent)
  : QMainWindow(parent)
@@ -176,21 +177,29 @@ void MainWindow::onWriteConfig()
 
 void MainWindow::onStopMission()
 {
-   m_ds1922->StopMission();
-   onReadConfig();
+   if (!m_ds1922->StopMission()) {
+     QMessageBox::critical(this, "Error", tr("Error stopping mission:\n")+m_ds1922->GetLastError().c_str());
+   } else {
+      onReadConfig();
+   }
 }
 
 void MainWindow::onClearData()
 {
-   m_ds1922->ClearMemory();
-   onReadData();
+   if (!m_ds1922->ClearMemory()) {
+     QMessageBox::critical(this, "Error", tr("Error clearing memory:\n")+m_ds1922->GetLastError().c_str());
+   } else {
+      onReadConfig();
+   }
 }
 
 void MainWindow::onStartMission()
 {
-   m_ds1922->ClearMemory();
-   m_ds1922->StartMission();
-   onReadConfig();
+   if (!m_ds1922->ClearMemory() || !m_ds1922->StartMission()) {
+     QMessageBox::critical(this, "Error", tr("Error starting mission:\n")+m_ds1922->GetLastError().c_str());
+   } else {
+      onReadConfig();
+   }
 }
 
 
@@ -231,11 +240,10 @@ void MainWindow::onSafe()
       }
       else
       {
-         QMessageBox::critical(this, tr("Error"), tr("Cannot open file for writting"));
+         QMessageBox::critical(this, tr("Error"), tr("Cannot open file for writing"));
       }
    }
 }
-
 
 void MainWindow::onPlot()
 {
@@ -267,5 +275,12 @@ void MainWindow::onPlot()
       gnuplot->waitForStarted();
 //    gnuplot->close();
    }
+}
 
+void MainWindow::onAbout()
+{
+   Ui_AboutDialog aboutDlg;
+   QDialog* dlg = new QDialog(this);
+   aboutDlg.setupUi(dlg);
+   dlg->show();
 }

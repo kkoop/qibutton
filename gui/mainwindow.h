@@ -26,6 +26,7 @@ public slots:
    virtual void onCopy();
    virtual void onSafe();
    virtual void onPlot();
+   virtual void onAbout();
    
 private:
 QString GetDataAsCsv();

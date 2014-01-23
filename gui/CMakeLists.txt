@@ -3,7 +3,7 @@ FIND_PACKAGE(Qt4 REQUIRED)
 
 SET(qibutton_SOURCES main.cpp mainwindow.cpp)
 SET(qibutton_HEADERS mainwindow.h)
-SET(qibutton_FORMS main.ui)
+SET(qibutton_FORMS main.ui about.ui)
 
 QT4_WRAP_CPP(qibutton_HEADERS_MOC ${qibutton_HEADERS})
 QT4_WRAP_UI(qibutton_FORMS_HEADERS ${qibutton_FORMS})
