@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QTemporaryFile>
 #include "ui_about.h"
+#include <QLocale>
 
 MainWindow::MainWindow(QWidget *parent)
  : QMainWindow(parent)
@@ -91,7 +92,7 @@ void MainWindow::onReadConfig()
    QString timeStamp;
    tm timeStampValue;
    m_ds1922->GetMissionTimestamp(&timeStampValue);
-   timeStamp.sprintf("%02d.%02d.%02d %02d:%02d:%02d", timeStampValue.tm_mday, 
+   timeStamp.sprintf("%02d.%02d.%02d   %02d:%02d:%02d", timeStampValue.tm_mday, 
                      timeStampValue.tm_mon+1, timeStampValue.tm_year-100, timeStampValue.tm_hour, 
                      timeStampValue.tm_min, timeStampValue.tm_sec);
    missionTimestampEdit->setText(timeStamp);
@@ -131,7 +132,7 @@ void MainWindow::onReadData()
       QTableWidgetItem *time = new QTableWidgetItem(dateTime.addSecs(i*sampleRate).toString(Qt::SystemLocaleShortDate));
       dataTable->setItem(i, 1, temperature);
       dataTable->setItem(i, 0, time);     
-   }
+   }   
 }
 
 void MainWindow::onWriteConfig()
@@ -206,16 +207,12 @@ void MainWindow::onStartMission()
 QString MainWindow::GetDataAsCsv()
 {
    QString data;
-   for (int i=0; i<dataTable->rowCount(); i++)
-   {
-     if (dataTable->item(i, 1)->text().toDouble())
-     {
+   for (int i=0; i<dataTable->rowCount(); i++) {
       data += dataTable->item(i, 0)->text();
       data += "\t";
       data += dataTable->item(i, 1)->text();
       data += "\n";
      }
-   }
    return data;
 }
 
@@ -249,6 +246,16 @@ void MainWindow::onPlot()
 {
    QTemporaryFile dataFile;
    QTemporaryFile scriptFile;
+   QLocale locale = QLocale::system();
+   QString date=locale.dateTimeFormat(QLocale::ShortFormat);
+   date.replace("mm","%M");
+   date.replace("MM","%m");
+   date.replace("yy","%y");
+   date.replace("HH","%H");
+   date.replace("dd","%d");
+   date.replace(" ", "_");
+
+   
    if (dataFile.open() && scriptFile.open()) 
    {
       dataFile.setAutoRemove(false);
@@ -259,15 +266,10 @@ void MainWindow::onPlot()
       out << data;
       QTextStream scriptOut(&scriptFile);
       scriptOut   << "set xdata time\n"
-               << "set timefmt \"%d.%m.%Y_%H:%M:%S\"\n" 
-               << "set format x \"%d.%m\"\n"
-               << "set ytics 36.00,0.0625\n"
-               << "set xtics \"01.01.2009_06:22:00\",864000*2\n"
-               << "set mxtics 20\n"
-               << "set grid\n"
-               << "plot '" << dataFile.fileName() << "' u 1:2 title \"Temperature\" with linespoints lt 4 lw 2\n" 
-               << "pause -1\n";
-               
+                  << "set timefmt" << " " << "\"" << date << "\"\n"
+                  << "set grid\n"
+                  << "plot '" << dataFile.fileName() << "' u 1:2 title \"Temperature\" with linespoints lt 4 lw 2\n" 
+                  << "pause -1\n";
       QProcess *gnuplot = new QProcess();
       QStringList arguments(scriptFile.fileName());
       arguments << "-";
