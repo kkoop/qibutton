@@ -9,6 +9,9 @@
 #include <QTemporaryFile>
 #include "ui_about.h"
 #include <QLocale>
+#include <string>
+#include <iostream>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent)
  : QMainWindow(parent)
@@ -16,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
    setupUi(this);
    m_ds9490 = new DS9490;
    m_ds1922 = new DS1922(m_ds9490);
+   //connect(&m_clockSet, SIGNAL(timeout()), this, SLOT(rtcEdit->stepUp()));
 }
 
 
@@ -43,6 +47,8 @@ void MainWindow::onReadConfig()
    rtcEdit->setDate(QDate(rtc.tm_year+1900, rtc.tm_mon+1, rtc.tm_mday));
    rtcEdit->setTime(QTime(rtc.tm_hour, rtc.tm_min, rtc.tm_sec));
    rtcEnabledCheckBox->setChecked(m_ds1922->GetRtcEnabled());
+   
+   //m_clockSet.start(1000);
    
    sampleRateSpinBox->setValue(m_ds1922->GetSampleRate());
    sampleRateSecondsRadioButton->setChecked(m_ds1922->GetHighspeedSampling());
@@ -89,13 +95,13 @@ void MainWindow::onReadConfig()
    
    missionStartDelaySpinBox->setValue(m_ds1922->GetMissionStartDelay());
    
-   QString timeStamp;
    tm timeStampValue;
    m_ds1922->GetMissionTimestamp(&timeStampValue);
-   timeStamp.sprintf("%02d.%02d.%02d   %02d:%02d:%02d", timeStampValue.tm_mday, 
-                     timeStampValue.tm_mon+1, timeStampValue.tm_year-100, timeStampValue.tm_hour, 
-                     timeStampValue.tm_min, timeStampValue.tm_sec);
-   missionTimestampEdit->setText(timeStamp);
+   
+   QDate date(QDate(timeStampValue.tm_year+1900, timeStampValue.tm_mon+1, timeStampValue.tm_mday));
+   QTime time(QTime(timeStampValue.tm_hour, timeStampValue.tm_min, timeStampValue.tm_sec));
+   
+   missionTimestampEdit->setText(date.toString(Qt::SystemLocaleShortDate)+" "+time.toString(Qt::TextDate));
    
    missionSampleCounterEdit->setText(QString::number(m_ds1922->GetSampleCount()));
    
@@ -129,7 +135,14 @@ void MainWindow::onReadData()
    
    for(int i=0; i<sampleCount; i++){
       QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[i]));
-      QTableWidgetItem *time = new QTableWidgetItem(dateTime.addSecs(i*sampleRate).toString(Qt::SystemLocaleShortDate));
+      
+      QDateTime addedTime=dateTime.addSecs(i*sampleRate);
+      
+      QDate date=addedTime.date();
+      QTime timeT=addedTime.time();
+      QString dateLocaleTime=date.toString(Qt::SystemLocaleShortDate)+" "+timeT.toString(Qt::TextDate);
+      
+      QTableWidgetItem *time = new QTableWidgetItem(dateLocaleTime);
       dataTable->setItem(i, 1, temperature);
       dataTable->setItem(i, 0, time);     
    }   
@@ -137,9 +150,6 @@ void MainWindow::onReadData()
 
 void MainWindow::onWriteConfig()
 {
-
-   //TODO: clock
-
    int sampleRate=sampleRateSpinBox->value();
    bool seconds=sampleRateSecondsRadioButton->isChecked();
    
@@ -247,15 +257,14 @@ void MainWindow::onPlot()
    QTemporaryFile dataFile;
    QTemporaryFile scriptFile;
    QLocale locale = QLocale::system();
-   QString date=locale.dateTimeFormat(QLocale::ShortFormat);
-   date.replace("mm","%M");
+   QString date=locale.dateFormat(QLocale::ShortFormat);
+
+   QString time="%H:%M:%S";
+   
+   date.replace("dd","%d");
    date.replace("MM","%m");
    date.replace("yy","%y");
-   date.replace("HH","%H");
-   date.replace("dd","%d");
-   date.replace(" ", "_");
 
-   
    if (dataFile.open() && scriptFile.open()) 
    {
       dataFile.setAutoRemove(false);
@@ -264,9 +273,10 @@ void MainWindow::onPlot()
       QString data = GetDataAsCsv();
       data.replace(" ", "_");
       out << data;
+      std::cout << data.toStdString() << std::endl;
       QTextStream scriptOut(&scriptFile);
       scriptOut   << "set xdata time\n"
-                  << "set timefmt" << " " << "\"" << date << "\"\n"
+                  << "set timefmt" << " " << "\"" << date << "_" << time <<"\"\n" 
                   << "set grid\n"
                   << "plot '" << dataFile.fileName() << "' u 1:2 title \"Temperature\" with linespoints lt 4 lw 2\n" 
                   << "pause -1\n";

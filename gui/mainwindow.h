@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <qtimer.h>
 #include "ui_main.h"
 
 
@@ -36,6 +37,7 @@ QString GetDataAsCsv();
 protected:
    DS1922* m_ds1922;
    DS9490* m_ds9490;
+   //QTimer m_clockSet;
 };
 
 #endif
