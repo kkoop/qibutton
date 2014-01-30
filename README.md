@@ -27,5 +27,6 @@ TODO
 one iButton device. The ROM in the DS9490B is another 1-Wire device,
 but it should ignore the DS1922 specific commmands.
 - [ ] Handle rollover
+- [ ] Support passwords
 - [x] Handle low resolution mode
 - [x] Add support for DS1922T
