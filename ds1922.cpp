@@ -221,6 +221,8 @@ bool DS1922::ClearMemory()
 
 bool DS1922::ReadCalibration()
 {
+   if (GetType()==DS1922E) // DS1922 does not support calibration
+      return false;
    if (!m_ds9490->DeviceOpen())
       if (!m_ds9490->OpenUsbDevice()) {
          m_lastError = m_ds9490->GetLastError();
@@ -601,5 +603,7 @@ DS1922::Type DS1922::GetType()
       return DS1922L;
    if (m_statusRegister[0x26]==0x60)
       return DS1922T;
+   if (m_statusRegister[0x26]==0x80)
+      return DS1922E;
    return Other;
 }

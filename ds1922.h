@@ -60,7 +60,7 @@ public:
    bool GetRollover();        // "
    bool GetStartUponAlarm();  // "
    int GetMissionStartDelay();// "
-   enum Type {DS1922L, DS1922T, Other};
+   enum Type {DS1922L, DS1922T, DS1922E, Other};
    DS1922::Type GetType();
    
    void SetRtc(tm* time);
