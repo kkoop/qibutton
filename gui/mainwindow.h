@@ -6,7 +6,6 @@
 #include "ui_main.h"
 
 
-
 class DS1922;
 class DS9490;
 
@@ -30,14 +29,14 @@ public slots:
    virtual void onAbout();
    
 private:
-QString GetDataAsCsv();
-   
+   QString GetDataAsCsv();
+   QDateTime TmToDateTime(tm* time);
+   void DateTimeToTm(QDateTime dateTime, tm* time);
    
    // data
 protected:
    DS1922* m_ds1922;
    DS9490* m_ds9490;
-   //QTimer m_clockSet;
 };
 
 #endif

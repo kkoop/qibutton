@@ -233,13 +233,6 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="2" colspan="2">
-        <widget class="QLineEdit" name="missionTimestampEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="9" column="0" colspan="2">
         <widget class="QLabel" name="label_4">
          <property name="text">
@@ -281,6 +274,13 @@
          </property>
         </spacer>
        </item>
+       <item row="8" column="2" colspan="2">
+        <widget class="QLineEdit" name="missionTimestampEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -292,7 +292,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDevice">
@@ -388,6 +388,26 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>rtcEdit</tabstop>
+  <tabstop>rtcEnabledCheckBox</tabstop>
+  <tabstop>sampleRateSpinBox</tabstop>
+  <tabstop>sampleRateSecondsRadioButton</tabstop>
+  <tabstop>sampleRateMinutesRadioButton</tabstop>
+  <tabstop>alarmLowEnabledCheckBox</tabstop>
+  <tabstop>alarmLowEdit</tabstop>
+  <tabstop>alarmHighEnabledCheckBox</tabstop>
+  <tabstop>alarmHighEdit</tabstop>
+  <tabstop>loggingCheckBox</tabstop>
+  <tabstop>highResLoggingCheckBox</tabstop>
+  <tabstop>startUponAlarmCheckBox</tabstop>
+  <tabstop>rolloverCheckBox</tabstop>
+  <tabstop>missionStartDelaySpinBox</tabstop>
+  <tabstop>missionTimestampEdit</tabstop>
+  <tabstop>missionSampleCounterEdit</tabstop>
+  <tabstop>deviceSampleCounterEdit</tabstop>
+  <tabstop>dataTable</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

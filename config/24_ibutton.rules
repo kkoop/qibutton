@@ -1,0 +1,11 @@
+# udev rules file for ds2490 usb adaptor for 1wire devices (for udev 0.98 version)
+# place in /etc/udev/rules.d
+
+ACTION!="add", GOTO="oww_rules_end"
+SUBSYSTEM=="usb_device", GOTO="oww_rules_start"
+SUBSYSTEM!="usb", GOTO="oww_rules_end"
+
+LABEL="oww_rules_start"
+ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", MODE="0664", GROUP="plugdev"
+
+LABEL="oww_rules_end"

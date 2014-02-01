@@ -7,19 +7,19 @@
 #include <QTextStream>
 #include <QProcess>
 #include <QTemporaryFile>
-#include "ui_about.h"
 #include <QLocale>
-#include <string>
-#include <iostream>
 #include <QString>
+#include "ui_about.h"
+#include <string>
+//#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
  : QMainWindow(parent)
 {
    setupUi(this);
+   rtcEdit->setDisplayFormat(QLocale::system().dateFormat(QLocale::ShortFormat)+" HH:mm:ss");
    m_ds9490 = new DS9490;
    m_ds1922 = new DS1922(m_ds9490);
-   //connect(&m_clockSet, SIGNAL(timeout()), this, SLOT(rtcEdit->stepUp()));
 }
 
 
@@ -44,11 +44,9 @@ void MainWindow::onReadConfig()
    // set all config settings 
    tm rtc;
    m_ds1922->GetRtc(&rtc);
-   rtcEdit->setDate(QDate(rtc.tm_year+1900, rtc.tm_mon+1, rtc.tm_mday));
-   rtcEdit->setTime(QTime(rtc.tm_hour, rtc.tm_min, rtc.tm_sec));
+   QDateTime rtcDateTime = TmToDateTime(&rtc);
+   rtcEdit->setDateTime(rtcDateTime);
    rtcEnabledCheckBox->setChecked(m_ds1922->GetRtcEnabled());
-   
-   //m_clockSet.start(1000);
    
    sampleRateSpinBox->setValue(m_ds1922->GetSampleRate());
    sampleRateSecondsRadioButton->setChecked(m_ds1922->GetHighspeedSampling());
@@ -97,17 +95,13 @@ void MainWindow::onReadConfig()
    
    tm timeStampValue;
    m_ds1922->GetMissionTimestamp(&timeStampValue);
-   
-   QDate date(QDate(timeStampValue.tm_year+1900, timeStampValue.tm_mon+1, timeStampValue.tm_mday));
-   QTime time(QTime(timeStampValue.tm_hour, timeStampValue.tm_min, timeStampValue.tm_sec));
-   
-   missionTimestampEdit->setText(date.toString(Qt::SystemLocaleShortDate)+" "+time.toString(Qt::TextDate));
+   QDateTime timeStamp = TmToDateTime(&timeStampValue);
+   missionTimestampEdit->setText(timeStamp.date().toString(Qt::SystemLocaleShortDate)
+                           +" "+timeStamp.time().toString(Qt::TextDate));
    
    missionSampleCounterEdit->setText(QString::number(m_ds1922->GetSampleCount()));
-   
+
    deviceSampleCounterEdit->setText(QString::number(m_ds1922->GetDeviceSampleCount()));
-   
-//  actionReadData->setEnabled(true);
 }
 
 void MainWindow::onReadData()
@@ -118,6 +112,7 @@ void MainWindow::onReadData()
    
    tm timeStampValue;
    m_ds1922->GetMissionTimestamp(&timeStampValue);
+   QDateTime timeStamp = TmToDateTime(&timeStampValue);
    
    double buffer[sampleCount];
    if (!m_ds1922->ReadData(buffer, sampleCount)) {
@@ -126,51 +121,46 @@ void MainWindow::onReadData()
    }
    
    dataTable->setRowCount(sampleCount);
-   QDateTime dateTime(QDate(timeStampValue.tm_year+1900, timeStampValue.tm_mon+1, timeStampValue.tm_mday),
-                      QTime(timeStampValue.tm_hour, timeStampValue.tm_min, timeStampValue.tm_sec));
    
    if (!m_ds1922->GetHighspeedSampling()) {
      sampleRate=sampleRate*60;
    }
    
    for(int i=0; i<sampleCount; i++){
-      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[i]));
-      
-      QDateTime addedTime=dateTime.addSecs(i*sampleRate);
-      
-      QDate date=addedTime.date();
-      QTime timeT=addedTime.time();
-      QString dateLocaleTime=date.toString(Qt::SystemLocaleShortDate)+" "+timeT.toString(Qt::TextDate);
-      
+      QDateTime addedTime=timeStamp.addSecs(i*sampleRate);
+      QString dateLocaleTime = addedTime.date().toString(Qt::SystemLocaleShortDate)
+                              +" "+addedTime.time().toString(Qt::TextDate);      
       QTableWidgetItem *time = new QTableWidgetItem(dateLocaleTime);
-      dataTable->setItem(i, 1, temperature);
+      
+      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[i]));
+
       dataTable->setItem(i, 0, time);     
+      dataTable->setItem(i, 1, temperature);
    }   
 }
 
 void MainWindow::onWriteConfig()
 {
-   int sampleRate=sampleRateSpinBox->value();
-   bool seconds=sampleRateSecondsRadioButton->isChecked();
+   tm rtc;
+   m_ds1922->GetRtc(&rtc);
+   if (rtcEdit->dateTime() != TmToDateTime(&rtc)) {
+      // only if time changed, otherwise the passed time since readout will be missing
+      DateTimeToTm(rtcEdit->dateTime(), &rtc);
+      m_ds1922->SetRtc(&rtc);
+   }
+   m_ds1922->SetRtcHighspeed(sampleRateSecondsRadioButton->isChecked());
+   m_ds1922->SetSampleRate(sampleRateSpinBox->value());
    
-   m_ds1922->SetRtcHighspeed(seconds);
-   m_ds1922->SetSampleRate(sampleRate);
+   m_ds1922->SetAlarmEnabled(alarmLowEnabledCheckBox->isChecked(), 
+                             alarmHighEnabledCheckBox->isChecked());
    
-   bool low =alarmLowEnabledCheckBox->isChecked();
-   bool high=alarmHighEnabledCheckBox->isChecked();
-      
-   m_ds1922->SetAlarmEnabled(low, high);
-   
-   double lowAlarm=alarmLowEdit->text().toDouble();
-   double highAlarm=alarmHighEdit->text().toDouble();
-   m_ds1922->SetAlarmLowThreshold(lowAlarm);
-   m_ds1922->SetAlarmHighThreshold(highAlarm);
+   m_ds1922->SetAlarmLowThreshold(alarmLowEdit->text().toDouble());
+   m_ds1922->SetAlarmHighThreshold(alarmHighEdit->text().toDouble());
    
    m_ds1922->SetHighResLogging(highResLoggingCheckBox->isChecked());
    m_ds1922->SetStartUponAlarm(startUponAlarmCheckBox->isChecked());
 
-   int delay=missionStartDelaySpinBox->value();
-   m_ds1922->SetMissionStartDelay(delay);
+   m_ds1922->SetMissionStartDelay(missionStartDelaySpinBox->value());
    
    m_ds1922->SetRollover(rolloverCheckBox->isChecked());
    
@@ -254,13 +244,12 @@ void MainWindow::onSafe()
 
 void MainWindow::onPlot()
 {
+   // Plot with gnuplot
    QTemporaryFile dataFile;
    QTemporaryFile scriptFile;
-   QLocale locale = QLocale::system();
-   QString date=locale.dateFormat(QLocale::ShortFormat);
 
+   QString date=QLocale::system().dateFormat(QLocale::ShortFormat);
    QString time="%H:%M:%S";
-   
    date.replace("dd","%d");
    date.replace("MM","%m");
    date.replace("yy","%y");
@@ -273,7 +262,6 @@ void MainWindow::onPlot()
       QString data = GetDataAsCsv();
       data.replace(" ", "_");
       out << data;
-      std::cout << data.toStdString() << std::endl;
       QTextStream scriptOut(&scriptFile);
       scriptOut   << "set xdata time\n"
                   << "set timefmt" << " " << "\"" << date << "_" << time <<"\"\n" 
@@ -295,4 +283,21 @@ void MainWindow::onAbout()
    QDialog* dlg = new QDialog(this);
    aboutDlg.setupUi(dlg);
    dlg->show();
+}
+
+QDateTime MainWindow::TmToDateTime(tm* time)
+{
+   QDateTime dateTime(QDate(time->tm_year+1900, time->tm_mon+1, time->tm_mday),
+                      QTime(time->tm_hour, time->tm_min, time->tm_sec));
+   return dateTime;
+}
+
+void MainWindow::DateTimeToTm(QDateTime dateTime, tm* time)
+{
+   time->tm_year = dateTime.date().year()-1900;
+   time->tm_mon = dateTime.date().month()-1;
+   time->tm_mday = dateTime.date().day();
+   time->tm_hour = dateTime.time().hour();
+   time->tm_min = dateTime.time().minute();
+   time->tm_sec = dateTime.time().second();
 }
