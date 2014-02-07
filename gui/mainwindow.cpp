@@ -107,12 +107,22 @@ void MainWindow::onReadConfig()
 void MainWindow::onReadData()
 {  
    onReadConfig();
+   
    int sampleCount=m_ds1922->GetSampleCount();
    int sampleRate=m_ds1922->GetSampleRate();
+   int maxMissionSamples = (m_ds1922->GetHighResLogging() ? 4096 : 8192);
+   int posOldestValue = sampleCount % maxMissionSamples;
    
    tm timeStampValue;
    m_ds1922->GetMissionTimestamp(&timeStampValue);
    QDateTime timeStamp = TmToDateTime(&timeStampValue);
+   
+   if (sampleCount>maxMissionSamples) {
+      timeStamp = timeStamp.addSecs(sampleRate*(sampleCount-maxMissionSamples));
+      sampleCount = maxMissionSamples;
+   } else {
+      posOldestValue = 0;
+   }
    
    double buffer[sampleCount];
    if (!m_ds1922->ReadData(buffer, sampleCount)) {
@@ -120,11 +130,11 @@ void MainWindow::onReadData()
      return;
    }
    
-   dataTable->setRowCount(sampleCount);
-   
    if (!m_ds1922->GetHighspeedSampling()) {
      sampleRate=sampleRate*60;
    }
+   
+   dataTable->setRowCount(sampleCount);
    
    for(int i=0; i<sampleCount; i++){
       QDateTime addedTime=timeStamp.addSecs(i*sampleRate);
@@ -132,7 +142,7 @@ void MainWindow::onReadData()
                               +" "+addedTime.time().toString(Qt::TextDate);      
       QTableWidgetItem *time = new QTableWidgetItem(dateLocaleTime);
       
-      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[i]));
+      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[(i+posOldestValue)%maxMissionSamples]));
 
       dataTable->setItem(i, 0, time);     
       dataTable->setItem(i, 1, temperature);
