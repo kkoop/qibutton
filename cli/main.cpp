@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <locale.h>
 
 #include "ds1922.h"
 #include "ds9490.h"
@@ -27,35 +29,68 @@ using namespace std;
 
 int main(int argc, char **argv) 
 {
+   setlocale(LC_ALL,"");
+   int optCount = 0;
+   bool scan=false, config=false, data=false;
+   int arg;
+   while ( (arg=getopt(argc, argv, "scd")) !=-1) {
+      optCount++;
+      switch (arg) {
+         case 's':
+            scan = true;
+            break;
+         case 'c':
+            config = true;
+            break;
+         case 'd':
+            data = true;
+            break;
+         case '?':
+         case 'h':
+            cout << "Usage: ibutton [-s] [-c] [-d]\n"
+                 << "  -s: Scan 1W bus\n"
+                 << "  -c: Read config\n"
+                 << "  -d: Read data\n"
+                 << " (default: -cd)" << endl;
+            return 1;
+      }
+   }
+   if (optCount==0) {
+      config = data = true;
+   }
+   
    DS9490 ds9490;
    DS1922 ds1922(&ds9490);
    
-   ds9490.OpenUsbDevice();
+   if (!ds9490.OpenUsbDevice()) {
+      cerr << ds9490.GetLastError() << endl;
+      return 1;
+   }
    
-   list<uint64_t> serials;
-   if (!ds9490.Scan1WBus(serials)) {
-      cout << ds9490.GetLastError() << endl;
-   } else {
-      for (list<uint64_t>::iterator it=serials.begin(); it!=serials.end(); ++it)
-      {
-         printf("Found device %016llx\n", *it);
+   if (scan) {
+      list<uint64_t> serials;
+      if (!ds9490.Scan1WBus(serials)) {
+         cout << ds9490.GetLastError() << endl;
+      } else {
+         for (list<uint64_t>::iterator it=serials.begin(); it!=serials.end(); ++it)
+         {
+            printf("Found device %016llx\n", *it);
+         }
       }
    }
-   
+
    if (!ds1922.ReadRegister()) {
       cout << ds1922.GetLastError() << endl;
+      return 1;
    }
-   else {
+   if (config) {
       tm time;
       ds1922.GetRtc(&time);
       cout << "Clock enabled: " << ds1922.GetRtcEnabled() << endl;
-      printf("Clock: %02d.%02d.%04d %02d:%02d:%02d\n",
-             time.tm_mday,
-             1+time.tm_mon,
-             1900+time.tm_year,
-             time.tm_hour,
-             time.tm_min,
-             time.tm_sec);
+      time_t tt = mktime(&time);
+      char buffer[64];
+      strftime(buffer, 64, "%x %X", localtime(&tt));
+      printf("Clock: %s\n", buffer);
       cout << "Mission in progress: " << ds1922.GetMissionInProgress() << endl;
       cout << "Sample rate: " << ds1922.GetSampleRate() << endl;
       cout << "Sample rate high res: " << ds1922.GetHighResLogging() << endl;
@@ -63,22 +98,24 @@ int main(int argc, char **argv)
       cout << "Device sample count: " << ds1922.GetDeviceSampleCount() << endl;
       cout << "Start upon alarm: " << ds1922.GetStartUponAlarm() << endl;
       cout << "Alarm activated: low temp: " << ds1922.GetAlarmLow()
-           << ", high temp: " << ds1922.GetAlarmHigh() << endl;
+         << ", high temp: " << ds1922.GetAlarmHigh() << endl;
       cout << "Alarm low temp: " << ds1922.GetAlarmLow()
-           << ", high temp: " << ds1922.GetAlarmHigh() << endl;
+         << ", high temp: " << ds1922.GetAlarmHigh() << endl;
       cout << "Waiting for alarm: " << ds1922.GetWaitingForAlarm() << endl;
       cout << "Logging enabled: " << ds1922.GetLoggingEnabled() << endl;
       cout << "Rollover: " << ds1922.GetRollover() << endl;
       cout << "Mission start delay: " << ds1922.GetMissionStartDelay() << endl;
       ds1922.GetMissionTimestamp(&time);
-      printf("Mission timestamp: %02d.%02d.%04d %02d:%02d:%02d\n",
-             time.tm_mday,
-             1+time.tm_mon,
-             1900+time.tm_year,
-             time.tm_hour,
-             time.tm_min,
-             time.tm_sec);
+      tt = mktime(&time);
+      strftime(buffer, 64, "%x %X", localtime(&tt));
+      printf("Mission timestamp: %s\n", buffer);
+   }
+   if (config && data)
       cout << "-Data--------------------------------------------" << endl;
+   
+   if (data) {
+      tm time;
+      ds1922.GetMissionTimestamp(&time);
       time_t tt = mktime(&time);
       // handle rollover: the oldest value may not be the first one
       int missionSamples = ds1922.GetSampleCount();
@@ -104,8 +141,7 @@ int main(int argc, char **argv)
             cout << buffer << ": " << values[(i+posOldestValue)%maxMissionSamples] << endl;
             tt += sampleRate;
          }
-         return 0;
       }
    }
-   return 1;
+   return 0;
 }
