@@ -137,7 +137,7 @@ int main(int argc, char **argv)
       } else {
          for (int i=0; i<missionSamples; i++) {
             char buffer[64];
-            strftime(buffer, 64, "%x %X", localtime(&tt));
+            strftime(buffer, 64, "%F %X", localtime(&tt));
             cout << buffer << ": " << values[(i+posOldestValue)%maxMissionSamples] << endl;
             tt += sampleRate;
          }
