@@ -67,8 +67,8 @@ bool DS1922::WriteRegister()
    // procedure: 1. write data to scratchpad, 
    //            2. verify scratchpad, 
    //            3. copy scratchpad to target address
-   unsigned char command[32+3] = {0x0F, // write scratchpad
-      m_rtcChanged ? 0x00 : 0x06, 0x02, // address
+   uint8_t command[32+3] = {0x0F, // write scratchpad
+      (uint8_t)(m_rtcChanged ? 0x00 : 0x06), 0x02, // address
    };
    if (m_rtcChanged) {
       memcpy(command+3, m_statusRegister, 32);
@@ -80,12 +80,12 @@ bool DS1922::WriteRegister()
       return false;
    }
    // read scratchpad to verify
-   unsigned char readspcommand[] = {0xAA}; // read scratchpad
+   uint8_t readspcommand[] = {0xAA}; // read scratchpad
    if (!m_ds9490->Write1W(readspcommand, 1)) {
       m_lastError = m_ds9490->GetLastError();
       return false;
    }
-   unsigned char scratchpad[3+32];
+   uint8_t scratchpad[3+32];
    if (!m_ds9490->Read1W(scratchpad, 3+32)) {
       m_lastError = m_ds9490->GetLastError();
       return false;
@@ -102,7 +102,7 @@ bool DS1922::WriteRegister()
       }
    }
    // copy scratchpad 
-   unsigned char copycommand[] = {0x99,  // copy scratchpad
+   uint8_t copycommand[] = {0x99,  // copy scratchpad
       scratchpad[0], scratchpad[1], scratchpad[2], // verification code
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
    };
@@ -182,7 +182,7 @@ bool DS1922::WriteRegister()
 
 bool DS1922::StartMission()
 {
-   unsigned char command[] = {0xCC, // start mission
+   uint8_t command[] = {0xCC, // start mission
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
       0xFF  // dummy byte
    };
@@ -195,7 +195,7 @@ bool DS1922::StartMission()
 
 bool DS1922::StopMission()
 {
-   unsigned char command[] = {0x33, // stop mission
+   uint8_t command[] = {0x33, // stop mission
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
       0xFF  // dummy byte
    };
@@ -208,7 +208,7 @@ bool DS1922::StopMission()
 
 bool DS1922::ClearMemory()
 {
-   unsigned char command[] = {0x96, // clear memory
+   uint8_t command[] = {0x96, // clear memory
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
       0xFF  // dummy byte
    };
@@ -228,7 +228,7 @@ bool DS1922::ReadCalibration()
          m_lastError = m_ds9490->GetLastError();
          return false;
       }
-   unsigned char page[32];
+   uint8_t page[32];
    if (!ReadMemPage(0x0240, page)) {
       return false;
    }
@@ -267,7 +267,7 @@ bool DS1922::ReadData(double* buffer, int size)
    // read min(numValues,missionSampleCount) values into the buffer
    // converted to °C
    // read one pages at a time  
-   unsigned char page[32];
+   uint8_t page[32];
    int missionSamples = GetSampleCount();
    if (size > missionSamples)
    {
@@ -301,7 +301,7 @@ bool DS1922::ReadData(double* buffer, int size)
    return true;
 }
 
-double DS1922::ConvertValue(unsigned char hiByte, unsigned char loByte)
+double DS1922::ConvertValue(uint8_t hiByte, uint8_t loByte)
 {
    // convert to °C
    int tempOffset = 1;
@@ -315,10 +315,10 @@ double DS1922::ConvertValue(unsigned char hiByte, unsigned char loByte)
    return result;
 }
 
-bool DS1922::ReadMemPage(short unsigned int address, unsigned char* buffer)
+bool DS1922::ReadMemPage(uint16_t address, uint8_t* buffer)
 {
-   unsigned char command[] = {0x69, // read memory
-      address&0xFF, (address&0xFF00)>>8,
+   uint8_t command[] = {0x69, // read memory
+      (uint8_t)(address&0xFF), (uint8_t)((address&0xFF00)>>8),
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy password (TODO: password)
    };
    if (!m_ds9490->Write1W(command, sizeof(command))) {
@@ -329,8 +329,8 @@ bool DS1922::ReadMemPage(short unsigned int address, unsigned char* buffer)
       m_lastError = m_ds9490->GetLastError();
       return false;
    }
-   unsigned char crcdata[3+32+2] = {0x69,
-      address&0xFF, (address&0xFF00)>>8};
+   uint8_t crcdata[3+32+2] = {0x69,
+      (uint8_t)(address&0xFF), (uint8_t)((address&0xFF00)>>8)};
    memcpy(crcdata+3, buffer, 32);
    if (!m_ds9490->Read1W(crcdata+3+32, 2)) {
       m_lastError = m_ds9490->GetLastError();
@@ -343,14 +343,14 @@ bool DS1922::ReadMemPage(short unsigned int address, unsigned char* buffer)
    return true;
 }
 
-bool DS1922::VerifyCrc(unsigned char* data, int length)
+bool DS1922::VerifyCrc(uint8_t* data, int length)
 {  // the CRC to verify has to be the last 2 bytes of data
-   const unsigned char oddparity[] = {0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0};
+   const uint8_t oddparity[] = {0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0};
 
-   unsigned short crcReg = 0;
+   uint16_t crcReg = 0;
    for (int i=0; i<length; i++) 
    {
-      unsigned short dbyte = (data[i]^ (crcReg&0xff) )&0xff;
+      uint16_t dbyte = (data[i]^ (crcReg&0xff) )&0xff;
       crcReg >>= 8;
       if (oddparity[dbyte&0xf]^oddparity[dbyte>>4]) {
          crcReg ^= 0xc001;
@@ -530,7 +530,7 @@ void DS1922::SetAlarmLowThreshold(double temp)
    if (GetType()==DS1922L)
       tempOffset = 41;
 
-   m_statusRegister[0x08] = (unsigned char)((temp+tempOffset)*2);
+   m_statusRegister[0x08] = (uint8_t)((temp+tempOffset)*2);
 }
 
 void DS1922::SetAlarmHighThreshold(double temp)
@@ -539,7 +539,7 @@ void DS1922::SetAlarmHighThreshold(double temp)
    if (GetType()==DS1922L)
       tempOffset = 41;
 
-   m_statusRegister[0x09] = (unsigned char)((temp+tempOffset)*2);
+   m_statusRegister[0x09] = (uint8_t)((temp+tempOffset)*2);
 }
 
 void DS1922::SetRtcEnabled(bool enabled)

@@ -78,16 +78,16 @@ public:
    // TODO: void SetPasswords()
    
 protected:
-   bool ReadMemPage(unsigned short address, unsigned char* buffer);
-   bool VerifyCrc(unsigned char* data, int length);
-   double ConvertValue(unsigned char hiByte, unsigned char loByte);
+   bool ReadMemPage(uint16_t address, uint8_t* buffer);
+   bool VerifyCrc(uint8_t* data, int length);
+   double ConvertValue(uint8_t hiByte, uint8_t loByte);
    bool ReadCalibration();
    
    // Data
 protected:
    DS9490* m_ds9490;
    std::string m_lastError;
-   unsigned char m_statusRegister[32*2];
+   uint8_t m_statusRegister[32*2];
    bool m_statusRegisterValid;
    bool m_rtcChanged;
    double m_calibration[3];

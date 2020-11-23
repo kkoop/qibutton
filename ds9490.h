@@ -35,16 +35,16 @@ public:
    bool OpenUsbDevice();
    bool DeviceOpen() {return m_usbDevHandle!=NULL;}
    bool Scan1WBus(std::list<uint64_t>& serials);
-   bool Read1W(unsigned char* buffer, uint length);
-   bool Write1W(unsigned char* buffer, uint length);
+   bool Read1W(uint8_t* buffer, uint length);
+   bool Write1W(uint8_t* buffer, uint length);
    bool Reset1W();
 protected:
    bool AquireUsb(struct usb_device* dev);
    bool Release();
-   bool ReadByte(unsigned char& read);
-   bool WriteByte(unsigned char data);
-   bool TouchByte(unsigned char write, unsigned char& read);
-   bool TouchBit(unsigned char write, unsigned char& read);
+   bool ReadByte(uint8_t& read);
+   bool WriteByte(uint8_t data);
+   bool TouchByte(uint8_t write, uint8_t& read);
+   bool TouchBit(uint8_t write, uint8_t& read);
    
    // Data
 protected:
@@ -64,7 +64,6 @@ protected:
          MOD_DSOW0_TREC=0x07};
 
    static const int m_timeout=5000;
-   
 };
 
 #endif // DS2490_H

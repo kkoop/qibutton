@@ -126,8 +126,8 @@ bool DS9490::Scan1WBus(list<uint64_t>& serials)
       * 2. all participating devices return inverted address bit
       * 3. master sends chosen address bit 
       */
-      unsigned char bit1, bit2;
-      unsigned char lastZero = 0;
+      uint8_t bit1, bit2;
+      uint8_t lastZero = 0;
       for (int bitNumber=0; bitNumber<64; bitNumber++)
       {
          if (!TouchBit(1, bit1) || !TouchBit(1, bit2))
@@ -135,7 +135,7 @@ bool DS9490::Scan1WBus(list<uint64_t>& serials)
          if (bit1 && bit2) 
             return true; // no device on bus
          
-         unsigned char searchDirection;
+         uint8_t searchDirection;
          if (bit1!=bit2) {
             // only one bit is present
             searchDirection = bit1;
@@ -162,7 +162,7 @@ bool DS9490::Scan1WBus(list<uint64_t>& serials)
    return true;
 }
 
-bool DS9490::Read1W(unsigned char* buffer, uint length)
+bool DS9490::Read1W(uint8_t* buffer, uint length)
 {
    if (!DeviceOpen()) {
       m_lastError = "Device not open";
@@ -176,7 +176,7 @@ bool DS9490::Read1W(unsigned char* buffer, uint length)
    return true;
 }
 
-bool DS9490::Write1W(unsigned char* buffer, uint length)
+bool DS9490::Write1W(uint8_t* buffer, uint length)
 {
    if (!DeviceOpen()) {
       m_lastError = "Device not open";
@@ -222,14 +222,14 @@ bool DS9490::Reset1W()
    return true;
 }
 
-bool DS9490::ReadByte(unsigned char& read)
+bool DS9490::ReadByte(uint8_t& read)
 {
    return TouchByte(0xFF, read);
 }
 
-bool DS9490::WriteByte(unsigned char data)
+bool DS9490::WriteByte(uint8_t data)
 {
-   unsigned char read;
+   uint8_t read;
    if (TouchByte(data, read))
    {
       if (read!=data) {
@@ -241,7 +241,7 @@ bool DS9490::WriteByte(unsigned char data)
    return false;
 }
 
-bool DS9490::TouchByte(unsigned char write, unsigned char& read)
+bool DS9490::TouchByte(uint8_t write, uint8_t& read)
 {
    int result = usb_control_msg(m_usbDevHandle, 0x40, COMM_CMD, 
                                 0x0053, write, NULL, 0, m_timeout);
@@ -272,7 +272,7 @@ bool DS9490::TouchByte(unsigned char write, unsigned char& read)
    return true;
 }
 
-bool DS9490::TouchBit(unsigned char write, unsigned char& read)
+bool DS9490::TouchBit(uint8_t write, uint8_t& read)
 {
     int result = usb_control_msg(m_usbDevHandle, 0x40, COMM_CMD, 
                                 0x0021|((write&1)<<3), 0, NULL, 0, m_timeout);
