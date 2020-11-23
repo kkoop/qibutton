@@ -18,10 +18,7 @@
 
 
 #include "ds9490.h"
-#include <stdio.h>
 
-#include <iostream>
-using namespace std;
 
 DS9490::DS9490()
 {
@@ -36,6 +33,12 @@ DS9490::~DS9490()
    }  
 }
 
+/**
+ * @brief Searches for a DS9490 USB device and opens a handle
+ * 
+ * Currently, only one USB device is supported, so the first one found is used. 
+ * @return bool: true on success, false on failure. On failure, an error message is available from GetLastError().
+ */
 bool DS9490::OpenUsbDevice()
 {
    struct usb_bus *bus;
@@ -102,7 +105,12 @@ bool DS9490::Release()
    return true;
 }
 
-bool DS9490::Scan1WBus(list<uint64_t>& serials)
+/**
+ * @brief Scan the 1-Wire bus for devices
+ * 
+ * The found devices are returned in @p serials. 
+ */
+bool DS9490::Scan1WBus(std::list<uint64_t>& serials)
 {
    if (!DeviceOpen()) {
       m_lastError = "Device not open";

@@ -21,9 +21,12 @@
 #include "ds9490.h"
 #include <string.h>
 
-/*#include <iostream>
-using namespace std;*/
 
+/**
+ * @brief Constructor
+ * 
+ * @param DS9490* ds9490: Pointer to an instance of class DS9490, which needs to have a lifetime longer than this object.
+ */
 DS1922::DS1922(DS9490* ds9490)
 {
    m_ds9490 = ds9490;
@@ -37,6 +40,13 @@ DS1922::~DS1922()
 
 }
 
+/**
+ * @brief Read configuration memory pages
+ * 
+ * After reading the configuration memory pages, individual settings are available using the Get...() functions.
+ * 
+ * @return bool: true on success, false on error. On error, the error message is available from GetLastError().
+ */
 bool DS1922::ReadRegister()
 {
    if (!m_ds9490->DeviceOpen())
@@ -56,6 +66,13 @@ bool DS1922::ReadRegister()
    return false;
 }
 
+/**
+ * @brief Writes the configuration memory pages
+ * 
+ * After setting all configuration registers using the Set...() function of this class,
+ * this function can be used to write these settings to the device.
+ * @return bool: true on success, false on error.
+ */
 bool DS1922::WriteRegister()
 {
    if (!m_statusRegisterValid) {
@@ -180,6 +197,11 @@ bool DS1922::WriteRegister()
    return true;
 }
 
+/**
+ * @brief Starts a logging mission.
+ * 
+ * See the datasheet of the DS1922 for details about missions.
+ */
 bool DS1922::StartMission()
 {
    uint8_t command[] = {0xCC, // start mission
@@ -193,6 +215,9 @@ bool DS1922::StartMission()
    return true;
 }
 
+/**
+ * @brief Stops a logging mission.
+ */
 bool DS1922::StopMission()
 {
    uint8_t command[] = {0x33, // stop mission
@@ -206,6 +231,9 @@ bool DS1922::StopMission()
    return true;
 }
 
+/**
+ * @brief Clears the logging memory.
+ */
 bool DS1922::ClearMemory()
 {
    uint8_t command[] = {0x96, // clear memory
@@ -219,6 +247,12 @@ bool DS1922::ClearMemory()
    return true;
 }
 
+/**
+ * @brief Read calibration data
+ * 
+ * Calibration data is included as coefficients of a correction polynomial, and set during production of
+ * the device, see the datasheet for details.
+ */
 bool DS1922::ReadCalibration()
 {
    if (GetType()==DS1922E) // DS1922 does not support calibration
@@ -255,6 +289,12 @@ bool DS1922::ReadCalibration()
    return true;
 }
 
+/**
+ * @brief Read the logged data into buffer
+ * 
+ * The number of samples read is determined by the number of available values and
+ * @p size. The values returned in @p buffer are in °C.
+ */
 bool DS1922::ReadData(double* buffer, int size)
 {
    if (!m_statusRegisterValid) {
@@ -363,13 +403,21 @@ bool DS1922::VerifyCrc(uint8_t* data, int length)
    return crcReg==0xB001;
 }
 
-
+/**
+ * @brief Number of samples in current mission
+ */
 int DS1922::GetSampleCount()
 {
    return (m_statusRegister[0x22]<<16) | (m_statusRegister[0x21]<<8)
       | (m_statusRegister[0x20]);
 }
 
+/**
+ * @brief Total number of samples created by this device
+ * 
+ * This value is not reset when a new mission starts. It can be used as measure of the devices' total use time,
+ * and to estimate the remaining battery life.
+ */
 int DS1922::GetDeviceSampleCount()
 {
    return m_statusRegister[0x25]<<16 | m_statusRegister[0x24]<<8
@@ -396,11 +444,21 @@ void DS1922::GetMissionTimestamp(tm* time)
    time->tm_sec   = ((m_statusRegister[0x19] & 0xf0)>>4) * 10 + (m_statusRegister[0x19] & 0x0f);
 }
 
+/**
+ * @brief Returns the time between to samples
+ * 
+ * Unit is seconds if GetHighspeedSampling() returns true, otherwise it's minutes.
+ */
 int DS1922::GetSampleRate()
 {
    return m_statusRegister[7]<<8 | m_statusRegister[6];
 }
 
+/**
+ * @brief Returns wether the RTC oscillator is enabled
+ * 
+ * Switching the RTC off when no mission is active saves battery.
+ */
 bool DS1922::GetRtcEnabled()
 {
    return (m_statusRegister[0x12]&0x1)==0x1;
@@ -474,6 +532,13 @@ bool DS1922::GetHighResLogging()
    return (m_statusRegister[0x13]&0x4)==0x4;
 }
 
+/**
+ * @brief Returns the value of the Rollover Control bit
+ * 
+ * With rollover enabled, the device overwrites old data once the logging memory is full. If disabled,
+ * data logging stops on full memory.
+ * The calculation of the timestamps of logged values has to take rollover into account.
+ */
 bool DS1922::GetRollover()
 {
    return (m_statusRegister[0x13]&0x10)==0x10;
@@ -512,6 +577,9 @@ void DS1922::SetSampleRate(int rate)
    }
 }
 
+/**
+ * @brief Enables or disables temperature threshold start conditions
+ */
 void DS1922::SetAlarmEnabled(bool tempLow, bool tempHigh)
 {
    if (tempLow)

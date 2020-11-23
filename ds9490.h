@@ -24,6 +24,13 @@
 #include <list>
 #include <usb.h>
 
+/**
+ * @brief Represents a Maxim DS9490 USB 1-Wire reader
+ * 
+ * This class handles the communication with the USB 1-Wire reader using libusb. It includes functions to scan for devices
+ * on the 1-Wire bus, read from and write to the found devices, and reset the bus. On error, these functions return false,
+ * and the error message can be retrieved using GetLastError().
+ */
 class DS9490
 {
 public:
@@ -47,7 +54,7 @@ protected:
    bool TouchBit(uint8_t write, uint8_t& read);
    
    // Data
-protected:
+private:
    std::string m_lastError;
    usb_dev_handle* m_usbDevHandle;
    

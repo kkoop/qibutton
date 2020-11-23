@@ -23,6 +23,17 @@
 
 class DS9490;
 
+/**
+ * @brief Represents a Maxim DS1922 1-Wire temperature sensor
+ * 
+ * This class can be used together with DS9490 to read from and write to the DS1922 temperature logger.
+ * As most configuration data is stored in two memory pages, all configuration is read and written at once,
+ * using the functions ReadRegister() and WriteRegister(). After reading, the configuration settings are 
+ * available using the individual Get...() functions, and can be modified using the respective Set...()
+ * functions. Only after calling WriteRegister() are the modified configurations written to the device.
+ * Functions that interact with the hardware return false on error, and the error message can be retrieved 
+ * using GetLastError().
+ */
 class DS1922
 {
 
@@ -84,7 +95,7 @@ protected:
    bool ReadCalibration();
    
    // Data
-protected:
+private:
    DS9490* m_ds9490;
    std::string m_lastError;
    uint8_t m_statusRegister[32*2];
