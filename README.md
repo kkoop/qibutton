@@ -7,11 +7,11 @@ About
 =====
 This tool can be used to read an iButton temperature sensor DS1922L/T/E
 via the USB 1-Wire adapter DS9490 (chip is a DS2490) on Linux. 
-Two tools are included, a CLI and a GUI based on QT4. 
+Two tools are included, a CLI and a GUI based on QT5. 
 
 Requirements
 ============
-* USB communication uses libusb. This only works if the kernel 
+* USB communication uses libusb-dev. This only works if the kernel 
 module ds2490 is not loaded (-> rmmod ds2490 or blacklist).
 * The user needs r/w access to the USB device. A udev rule should
 be used to change group to plugdev for Vendor ID 04FA, ProductID 2490
