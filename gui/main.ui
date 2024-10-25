@@ -412,7 +412,7 @@
  <connections>
   <connection>
    <sender>actionExit</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
@@ -428,7 +428,7 @@
   </connection>
   <connection>
    <sender>actionReadConfig</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onReadConfig()</slot>
    <hints>
@@ -444,7 +444,7 @@
   </connection>
   <connection>
    <sender>actionReadData</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onReadData()</slot>
    <hints>
@@ -460,7 +460,7 @@
   </connection>
   <connection>
    <sender>actionWriteConfig</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onWriteConfig()</slot>
    <hints>
@@ -476,7 +476,7 @@
   </connection>
   <connection>
    <sender>actionStopMission</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onStopMission()</slot>
    <hints>
@@ -492,7 +492,7 @@
   </connection>
   <connection>
    <sender>actionClearData</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onClearData()</slot>
    <hints>
@@ -508,7 +508,7 @@
   </connection>
   <connection>
    <sender>actionStartMission</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onStartMission()</slot>
    <hints>
@@ -524,7 +524,7 @@
   </connection>
   <connection>
    <sender>actionSave</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onSafe()</slot>
    <hints>
@@ -540,7 +540,7 @@
   </connection>
   <connection>
    <sender>actionCopy</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onCopy()</slot>
    <hints>
@@ -556,7 +556,7 @@
   </connection>
   <connection>
    <sender>actionPlot</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onPlot()</slot>
    <hints>
@@ -572,7 +572,7 @@
   </connection>
   <connection>
    <sender>actionAbout</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>onAbout()</slot>
    <hints>
