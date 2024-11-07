@@ -78,7 +78,6 @@ bool DS9490::AquireUsb(struct usb_device* dev)
       return false;
    }
    if (usb_set_configuration(m_usbDevHandle, 1) != 0) {
-      std::cerr << "usb_set_configuration error: " << usb_strerror() << std::endl;
       m_lastError = "Failed to set configuration";
       Release();
       return false;

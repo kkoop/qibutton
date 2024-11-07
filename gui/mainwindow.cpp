@@ -136,16 +136,15 @@ void MainWindow::onReadData()
    
    dataTable->setRowCount(sampleCount);
    
-   for(int i=0; i<sampleCount; i++){
-      QDateTime addedTime=timeStamp.addSecs(i*sampleRate);
- QString dateLocaleTime = QLocale().toString(addedTime.date(), QLocale::ShortFormat)
-                         +" "+addedTime.time().toString(Qt::TextDate);
-      QTableWidgetItem *time = new QTableWidgetItem(dateLocaleTime);
-      
-      QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[(i+posOldestValue)%maxMissionSamples]));
+   for(int i = 0; i < sampleCount; i++) {
+       QDateTime addedTime = timeStamp.addSecs(i * sampleRate);
+       QString dateLocaleTime = QLocale().toString(addedTime, QLocale::ShortFormat);
+       QTableWidgetItem *time = new QTableWidgetItem(dateLocaleTime);
 
-      dataTable->setItem(i, 0, time);     
-      dataTable->setItem(i, 1, temperature);
+       QTableWidgetItem *temperature = new QTableWidgetItem(QString::number(buffer[(i + posOldestValue) % maxMissionSamples]));
+
+       dataTable->setItem(i, 0, time);
+       dataTable->setItem(i, 1, temperature);
    }   
 }
 
