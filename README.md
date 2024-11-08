@@ -15,7 +15,8 @@ Requirements
 module ds2490 is not loaded (-> rmmod ds2490 or blacklist).
 * The user needs r/w access to the USB device. A udev rule should
 be used to change group to plugdev for Vendor ID 04FA, ProductID 2490
-* QT4
+* QT5
+* Gnuplot to display the measured values as a plo.
 
 
 TODO
