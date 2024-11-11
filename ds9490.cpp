@@ -18,6 +18,7 @@
 
 
 #include "ds9490.h"
+#include <iostream>  // Für std::cerr und std::endl
 
 
 DS9490::DS9490()
@@ -76,8 +77,7 @@ bool DS9490::AquireUsb(struct usb_device* dev)
       m_lastError = "Failed to open USB device";
       return false;
    }
-   if (usb_set_configuration(m_usbDevHandle, 1)!=0)
-   {
+   if (usb_set_configuration(m_usbDevHandle, 1) != 0) {
       m_lastError = "Failed to set configuration";
       Release();
       return false;

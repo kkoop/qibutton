@@ -74,7 +74,7 @@ int main(int argc, char **argv)
       } else {
          for (list<uint64_t>::iterator it=serials.begin(); it!=serials.end(); ++it)
          {
-            printf("Found device %016llx\n", *it);
+            printf("Found device %016lx\n", *it);
          }
       }
    }

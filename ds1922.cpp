@@ -20,6 +20,7 @@
 #include "ds1922.h"
 #include "ds9490.h"
 #include <string.h>
+#include <ctime>
 
 
 /**

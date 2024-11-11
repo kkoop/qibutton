@@ -20,6 +20,7 @@
 #ifndef DS1922_H
 #define DS1922_H
 #include <string>
+#include <cstdint>
 
 class DS9490;
 
